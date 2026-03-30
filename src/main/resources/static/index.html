@@ -1,68 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NeuroTrack Predictor</title>
+    <title>NeuroTrack</title>
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
         body {
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             text-align: center;
-            margin-top: 100px;
         }
-        input {
-            padding: 10px;
-            margin: 10px;
-            width: 200px;
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
         }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .input-box:focus {
+            border-color: #6c63ff;
+            outline: none;
+        }
+
         button {
-            padding: 10px 20px;
-            background: #22c55e;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
             border: none;
+            border-radius: 8px;
+            background: #ff6b6b;
             color: white;
+            font-weight: bold;
             cursor: pointer;
+            transition: 0.3s;
         }
-        #result {
-            margin-top: 20px;
-            font-size: 20px;
+
+        button:hover {
+            background: #ff5252;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .high { color: red; }
+        .moderate { color: orange; }
+        .low { color: green; }
+
+        .subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>NeuroTrack Prediction 🚀</h1>
+<div class="container">
+    <h2>NeuroTrack</h2>
 
-<input type="number" id="screen" placeholder="Screen Time"><br>
-<input type="number" id="unlocks" placeholder="Unlocks"><br>
-<input type="number" id="night" placeholder="Night Usage"><br>
+    <input id="screen" class="input-box" type="number" placeholder="Screen Time (hrs)">
+    <input id="unlock" class="input-box" type="number" placeholder="Unlocks">
+    <input id="night" class="input-box" type="number" placeholder="Night Usage (0/1)">
 
-<button onclick="predict()">Predict</button>
+    <button onclick="predict()">Analyze Behavior</button>
 
-<div id="result"></div>
+    <div id="result" class="result"></div>
+
+    <p class="subtitle">Powered by ML + Spring Boot API</p>
+</div>
 
 <script>
     function predict() {
+
         const data = {
             screen_time: parseFloat(document.getElementById("screen").value),
-            unlocks: parseFloat(document.getElementById("unlocks").value),
-            night_usage: parseFloat(document.getElementById("night").value)
+            unlocks: parseInt(document.getElementById("unlock").value),
+            night_usage: parseInt(document.getElementById("night").value)
         };
 
         fetch("/predict", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify(data)
         })
         .then(res => res.json())
-        .then(data => {
-            document.getElementById("result").innerText =
-                "Prediction: " + data.prediction;
-        })
-        .catch(err => {
-            document.getElementById("result").innerText = "Error!";
+        .then(res => {
+            let r = document.getElementById("result");
+            r.innerText = "Prediction: " + res.prediction;
+
+            r.className = "result " + res.prediction.toLowerCase();
         });
     }
 </script>
