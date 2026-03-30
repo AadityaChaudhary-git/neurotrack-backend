@@ -1,12 +1,14 @@
 package com.neurotrack.backend.controller;
 
 import org.springframework.web.bind.annotation.*;
+
 import weka.classifiers.Classifier;
 import weka.core.*;
+import weka.core.SerializationHelper;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
-import java.io.InputStream;
 
 @RestController
 @RequestMapping("/predict")
@@ -16,11 +18,13 @@ public class PredictionController {
 
     public PredictionController() throws Exception {
 
-        // 🔥 SAFE MODEL LOADING (IMPORTANT FOR DEPLOYMENT)
-        InputStream modelStream = getClass().getClassLoader().getResourceAsStream("model.model");
+        // 🔥 Load model from resources
+        InputStream modelStream = getClass()
+                .getClassLoader()
+                .getResourceAsStream("model.model");
 
         if (modelStream == null) {
-            throw new RuntimeException("❌ Model file not found in resources!");
+            throw new RuntimeException("❌ model.model not found in resources");
         }
 
         model = (Classifier) SerializationHelper.read(modelStream);
@@ -48,7 +52,6 @@ public class PredictionController {
 
         DenseInstance instance = new DenseInstance(dataset.numAttributes());
 
-        // 🔥 REQUIRED
         instance.setDataset(dataset);
 
         instance.setValue(attributes.get(0), input.getScreen_time());
